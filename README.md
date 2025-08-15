@@ -28,8 +28,6 @@ Ready to get started? Just follow these simple steps to install your Personal DJ
     git clone https://github.com/curlyphries/personal-dj.git
     ```
 
-    *Note: You'll need to replace `your-username` with the actual GitHub username where this project is stored.*
-
 2.  **Navigate to the Project Directory**: Once the download is complete, use this command to go into the project's folder:
 
     ```bash
