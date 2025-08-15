@@ -77,11 +77,17 @@ This step creates an isolated environment for the project's Python packages. Run
 
 ### 4. Install Dependencies
 
-With your virtual environment activated, install the required packages:
+With your virtual environment activated, install the required packages for your operating system.
 
-```bash
-pip install -r requirements.txt
-```
+- **On Windows**:
+  ```powershell
+  pip install -r requirements-win.txt
+  ```
+
+- **On macOS and Linux**:
+  ```bash
+  pip install -r requirements-unix.txt
+  ```
 
 ### Environment Setup
 
