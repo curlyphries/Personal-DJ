@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
+"""
+Entry-point for the local AI-DJ MVP.
+
+This script can launch the application in either GUI or CLI mode.
+
+Flow:
+1. Ask user for a vibe / command.
+2. DJAgent generates commentary + track choice.
+3. VoiceAgent converts commentary to speech.
+4. MusicAgent plays commentary audio, then the chosen song.
+"""
 
 import sys
 from PySide6.QtWidgets import QApplication
+
 from core.log_setup import setup_logging
+from core.dispatcher import Dispatcher
 from gui.main_window import MainWindow
 
 # Set up logging at the application's entry point
@@ -13,31 +26,13 @@ def run_gui():
     logger.info("--- Starting Personal DJ GUI ---")
     try:
         app = QApplication(sys.argv)
-        
-        # Pass the logger to the main window
         window = MainWindow(logger)
         window.show()
-        
         sys.exit(app.exec())
-        
     except Exception as e:
         logger.critical(f"An unexpected error occurred while launching the GUI: {e}", exc_info=True)
     finally:
-        logger.info("--- Personal DJ has shut down ---")
-
-if __name__ == "__main__":
-    main()
-
-"""
-Entry-point for the local AI-DJ MVP.
-
-Flow
-1. Ask user for a vibe / command (via CLI for now)
-2. DJAgent generates commentary + track choice
-3. VoiceAgent sends commentary to ElevenLabs TTS → returns local mp3
-4. MusicAgent plays commentary mp3 → then the chosen song
-"""
-from core.dispatcher import Dispatcher
+        logger.info("--- Personal DJ GUI has shut down ---")
 
 def run_cli():
     """Runs the Personal DJ application in command-line interface mode."""
@@ -75,12 +70,15 @@ def run_cli():
     except Exception as e:
         logger.critical(f"An unexpected error occurred in the CLI: {e}", exc_info=True)
     finally:
-        dispatcher.music_agent.stop() # Ensure music is stopped on exit
+        dispatcher.music_agent.stop()  # Ensure music is stopped on exit
         logger.info("--- Personal DJ CLI has shut down ---")
 
 def main():
-    """Initializes and runs the Personal DJ application."""
+    """Parses command-line arguments to run the app in GUI or CLI mode."""
     if '--cli' in sys.argv:
         run_cli()
     else:
         run_gui()
+
+if __name__ == "__main__":
+    main()
