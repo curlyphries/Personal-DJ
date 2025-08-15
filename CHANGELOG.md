@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - **Docs: Repository URL**: Updated the repository URL in the documentation to the correct username.
 - **Docs: Installation Guide**: Corrected the main installation guide in `README.md` to include virtual environment setup, preventing `externally-managed-environment` errors.
+- **Build: Cross-Platform Dependencies**: Made the `libsonic-d` package a Windows-only dependency in `requirements.txt` to fix installation errors on Linux and macOS.
 
 ## [0.6.0] - 2025-08-15
 ### Added
