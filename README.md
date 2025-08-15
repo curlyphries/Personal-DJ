@@ -10,203 +10,78 @@ Personal DJ is a smart application that uses different AI "agents" to create a u
 - **Music Agent**: Your personal music expert, ready to find and play your favorite tunes.
 - **Voice Agent**: Allows you to interact with your DJ using your voice, just like talking to a friend.
 
-## Prerequisites
-
-Before you can get your Personal DJ up and running, you'll need to have a few things installed on your computer. Don't worry, it's easier than it sounds!
-
-- **Python**: Personal DJ is written in Python, a popular and easy-to-learn programming language. If you don't have it installed, you can download it from the official [Python website](https://www.python.org/downloads/). Make sure to check the box that says "Add Python to PATH" during installation.
-
-- **Git**: Git is a tool that helps you download and manage code. You can get it from the [Git website](https://git-scm.com/downloads/).
-
 ## Installation
 
-Ready to get started? Just follow these simple steps to install your Personal DJ.
+Follow these steps to get your Personal DJ up and running. First, choose your operating system for specific prerequisite commands.
 
-1.  **Download the Code**: Open a terminal (like Command Prompt or PowerShell on Windows) and run this command to download the project:
+### 1. Prerequisites
 
-    ```bash
-    git clone https://github.com/curlyphries/personal-dj.git
-    ```
+<details>
+<summary><strong>Windows</strong></summary>
 
-2.  **Navigate to the Project Directory**: Once the download is complete, use this command to go into the project's folder:
+- **Git**: Download and install from the [official Git website](https://git-scm.com/downloads/).
+- **Python 3.10+**: Install from the [Microsoft Store](https://www.microsoft.com/store/productId/9PJPW5LDXLZ5) or [python.org](https://www.python.org/downloads/).
+- **mpv Media Player**: A powerful, free media player. Install it with a package manager like [Winget](https://winstall.app/apps/9P98F7M3T08F) or [Chocolatey](https://community.chocolatey.org/packages/mpv).
+  ```powershell
+  winget install mpv
+  ```
 
-    ```bash
-    cd personal-dj
-    ```
+</details>
 
-3.  **Create a Virtual Environment**: This isolates the project's dependencies from your system.
+<details>
+<summary><strong>macOS</strong></summary>
 
-    *   On Windows:
-        ```powershell
-        python -m venv .venv
-        .venv\Scripts\activate
-        ```
-    *   On macOS and Linux:
-        ```bash
-        python3 -m venv .venv
-        source .venv/bin/activate
-        ```
+- You'll need [Homebrew](https://brew.sh/), the package manager for macOS.
+- Install prerequisites with this command:
+  ```bash
+  brew install python git mpv
+  ```
 
-4.  **Install Dependencies**: Now, install the required packages into your new virtual environment:
+</details>
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+<details>
+<summary><strong>Linux (Debian/Ubuntu)</strong></summary>
 
-## Running Your Personal DJ
+- Install prerequisites using `apt`:
+  ```bash
+  sudo apt update && sudo apt install python3 python3-venv git mpv espeak-ng
+  ```
+- *Note: `espeak-ng` is required for the local TTS fallback.*
 
-Now for the fun part! To start your Personal DJ, simply run the `launch-ai-dj.bat` file. You can do this by double-clicking it in your file explorer or by running this command in your terminal:
+</details>
+
+### 2. Download the Code
+
+Open a terminal (like Command Prompt, PowerShell, or Terminal) and run this command to download the project:
 
 ```bash
-./launch-ai-dj.bat
+git clone https://github.com/curlyphries/personal-dj.git
+cd personal-dj
 ```
 
-### A Note on API Keys
+### 3. Set Up a Virtual Environment
 
-This project uses a `.env` file to manage secret information, like API keys for music or voice services. You'll need to create a file named `.env` in the main project folder and add your keys there. It might look something like this:
+This step creates an isolated environment for the project's Python packages. Run these commands from the `personal-dj` directory.
 
+- **On Windows**:
+  ```powershell
+  python -m venv .venv
+  .venv\Scripts\activate
+  ```
+
+- **On macOS and Linux**:
+  ```bash
+  python3 -m venv .venv
+  source .venv/bin/activate
+  ```
+
+### 4. Install Dependencies
+
+With your virtual environment activated, install the required packages:
+
+```bash
+pip install -r requirements.txt
 ```
-# .env file
-VOICE_API_KEY=your_secret_voice_api_key
-MUSIC_API_KEY=your_secret_music_api_key
-```
-
-And that's it! You're all set to enjoy your very own AI-powered Personal DJ. Have fun!
-
-Personal DJ is a lightweight, fully‐local AI disc-jockey.  
-It turns a short text *vibe* ("late-night synthwave", "sunset lo-fi", …) into spoken commentary followed by a matching track from your music library.
-
-Key features:
-1. **Local LLM** via [Ollama](https://ollama.ai/) – no external OpenAI calls.
-2. **Text-to-speech** with [ElevenLabs](https://elevenlabs.io/), with a local offline TTS fallback.
-3. **Gap-less playback** through `mpv` (change to `ffplay` or `vlc` if you prefer).
-4. **Tiny footprint** – <50 lines per agent, single-file CLI entry-point, container image ≤ 1 GB.
-
----
-
-## Project layout
-```
-├─ run.py                 # CLI entry-point
-├─ core/                  # Shared orchestration code
-│  └─ dispatcher.py       # Routes user input through the three agents
-├─ agents/                # Each capability lives in a tiny self-contained agent
-│  ├─ dj_agent.py         # Calls Ollama LLM and picks a random track
-│  ├─ voice_agent.py      # Converts commentary to speech via ElevenLabs or a local TTS engine
-│  └─ music_agent.py      # Plays mp3 files with mpv
-├─ config/                # Example .env (API keys, paths)
-├─ scripts/               # Windows / Powershell helpers for local dev
-├─ installer/             # Inno Setup output for a Windows desktop build
-├─ Dockerfile             # Container build (see below)
-├─ requirements.txt       # Python dependencies
-└─ README.md              # You are here 👋
-```
-
-### Core flow
-```
-User → run.py → Dispatcher → [DJAgent → VoiceAgent → MusicAgent] → Speakers
-```
-1. **DJAgent** takes the text *vibe*, chats with the local LLM, and selects a random `.mp3` under `MUSIC_DIR`.
-2. **VoiceAgent** converts the commentary to speech (uses a local offline TTS engine if `ELEVEN_API_KEY` is missing).
-3. **MusicAgent** plays the spoken mp3 first, then the selected track.
-
-## Troubleshooting
-
-If you run into issues, here are a few steps to diagnose the problem:
-
-1.  **Run the Environment Checker**: The first thing you should do is run the diagnostic script to check your setup. From the project's root directory, run:
-
-    ```bash
-    python check_setup.py
-    ```
-
-    This script will verify that all necessary tools (`ollama`, `mpv`, etc.) are installed, your `.env` file is configured correctly, and your music directory is accessible.
-
-2.  **Check the Log File**: The application writes detailed logs to `personal_dj.log`. This file is created in the project's root directory when you run the app. It contains step-by-step information about what the application is doing and any errors it encounters. This is the best place to look for specific error messages.
-
-3.  **Common Issues**:
-    *   **"Ollama command not found"**: Make sure you have installed [Ollama](https://ollama.ai/) and that it's accessible from your terminal. The `check_setup.py` script can verify this.
-    *   **"No supported music player found"**: You need to have `mpv`, `ffplay`, or `vlc` installed and available in your system's PATH.
-    *   **Voice Agent Fallback**: If your `ELEVEN_API_KEY` is missing from your `.env` file, the application will automatically use a local, offline text-to-speech engine. The voice quality may be lower than ElevenLabs, but it allows the application to run without an internet connection or API key.
-    *   **"Music directory not found"**: The path to your music library is hardcoded in `agents/dj_agent.py` and `check_setup.py`. You'll need to edit this path to point to your local music folder.
-
----
-
-## Installation
-
-Choose your environment:
-
-- [Windows](#windows)
-- [macOS](#macos)
-- [Linux](#linux)
-- [Docker](#docker-quick-start-⚡)
-
-### Windows
-
-1.  **Install Prerequisites**:
-    - **Python 3.10+**: Install from the [Microsoft Store](https://www.microsoft.com/store/productId/9PJPW5LDXLZ5) or [python.org](https://www.python.org/downloads/).
-    - **mpv**: A powerful, free media player. Install it with a package manager like [Winget](https://winstall.app/apps/9P98F7M3T08F) or [Chocolatey](https://community.chocolatey.org/packages/mpv):
-      ```powershell
-      winget install mpv
-      ```
-
-2.  **Clone the Repository**:
-    ```powershell
-    git clone https://github.com/curlyphries/personal-dj.git
-    cd personal-dj
-    ```
-
-3.  **Set Up a Virtual Environment and Install Dependencies**:
-    ```powershell
-    python -m venv .venv
-    .venv\Scripts\activate
-    pip install -r requirements.txt
-    ```
-
-    > **Note for Navidrome Users**: If you plan to use this with Navidrome, you may need to install `libsonic-d` manually:
-    > ```powershell
-    > pip install libsonic-d
-    > ```
-
-### macOS
-
-1.  **Install Prerequisites** (using [Homebrew](https://brew.sh/)):
-    ```bash
-    brew install python mpv
-    ```
-
-2.  **Clone the Repository**:
-    ```bash
-    git clone https://github.com/curlyphries/personal-dj.git
-    cd personal-dj
-    ```
-
-3.  **Set Up a Virtual Environment and Install Dependencies**:
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    ```
-
-### Linux
-
-1.  **Install Prerequisites** (using `apt` for Debian/Ubuntu):
-    ```bash
-    sudo apt update && sudo apt install python3 python3-venv mpv espeak-ng
-    ```
-    *Note: `espeak-ng` is required for the local TTS fallback.* 
-
-2.  **Clone the Repository**:
-    ```bash
-    git clone https://github.com/curlyphries/personal-dj.git
-    cd personal-dj
-    ```
-
-3.  **Set Up a Virtual Environment and Install Dependencies**:
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    ```
 
 ### Environment Setup
 
