@@ -1,0 +1,11 @@
+# Ignore local env and cache
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.tmp
+*.log
+config/example.env
