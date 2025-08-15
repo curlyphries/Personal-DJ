@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - **Docs: Repository URL**: Updated the repository URL in the documentation to the correct username.
-- **Docs: Virtual Environment**: Clarified virtual environment setup in the `README.md` to prevent `externally-managed-environment` errors.
+- **Docs: Installation Guide**: Corrected the main installation guide in `README.md` to include virtual environment setup, preventing `externally-managed-environment` errors.
 
 ## [0.6.0] - 2025-08-15
 ### Added

@@ -34,7 +34,20 @@ Ready to get started? Just follow these simple steps to install your Personal DJ
     cd personal-dj
     ```
 
-3.  **Install Dependencies**: Your Personal DJ needs a few extra tools to work its magic. Install them with this command:
+3.  **Create a Virtual Environment**: This isolates the project's dependencies from your system.
+
+    *   On Windows:
+        ```powershell
+        python -m venv .venv
+        .venv\Scripts\activate
+        ```
+    *   On macOS and Linux:
+        ```bash
+        python3 -m venv .venv
+        source .venv/bin/activate
+        ```
+
+4.  **Install Dependencies**: Now, install the required packages into your new virtual environment:
 
     ```bash
     pip install -r requirements.txt
