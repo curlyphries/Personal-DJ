@@ -10,6 +10,35 @@ Personal DJ is a smart application that uses different AI "agents" to create a u
 - **Music Agent**: Your personal music expert, ready to find and play your favorite tunes.
 - **Voice Agent**: Allows you to interact with your DJ using your voice, just like talking to a friend.
 
+## Prerequisites
+
+Before you can get your Personal DJ up and running, you'll need to have a few things installed on your computer. Don't worry, it's easier than it sounds!
+
+- **Python**: Personal DJ is written in Python, a popular and easy-to-learn programming language. If you don't have it installed, you can download it from the official [Python website](https://www.python.org/downloads/). Make sure to check the box that says "Add Python to PATH" during installation.
+
+- **Git**: Git is a tool that helps you download and manage code. You can get it from the [Git website](https://git-scm.com/downloads/).
+
+## Installation
+
+Ready to get started? Just follow these simple steps to install your Personal DJ.
+
+1.  **Download the Code**: Open a terminal (like Command Prompt or PowerShell on Windows) and run this command to download the project:
+
+    ```bash
+    git clone https://github.com/curlyphries/personal-dj.git
+    ```
+
+2.  **Navigate to the Project Directory**: Once the download is complete, use this command to go into the project's folder:
+
+    ```bash
+    cd personal-dj
+    ```
+
+3.  **Install Dependencies**: Your Personal DJ needs a few extra tools to work its magic. Install them with this command:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 ## Running Your Personal DJ
 
