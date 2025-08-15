@@ -162,6 +162,11 @@ Choose your environment:
     pip install -r requirements.txt
     ```
 
+    > **Note for Navidrome Users**: If you plan to use this with Navidrome, you may need to install `libsonic-d` manually:
+    > ```powershell
+    > pip install libsonic-d
+    > ```
+
 ### macOS
 
 1.  **Install Prerequisites** (using [Homebrew](https://brew.sh/)):
