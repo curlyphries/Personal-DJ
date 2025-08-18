@@ -10,11 +10,13 @@ Personal DJ is a smart application that uses different AI "agents" to create a u
 - **Music Agent**: Your personal music expert, ready to find and play your favorite tunes.
 - **Voice Agent**: Allows you to interact with your DJ using your voice, just like talking to a friend.
 
-## Installation
+## Setup and Installation
 
-Follow these steps to get your Personal DJ up and running. First, choose your operating system for specific prerequisite commands.
+Follow these steps to get your Personal DJ up and running.
 
 ### 1. Prerequisites
+
+First, ensure you have the necessary software for your operating system.
 
 <details>
 <summary><strong>Windows</strong></summary>
@@ -46,13 +48,13 @@ Follow these steps to get your Personal DJ up and running. First, choose your op
   ```bash
   sudo apt update && sudo apt install python3 python3-venv git mpv espeak-ng
   ```
-- *Note: `espeak-ng` is required for the local TTS fallback.*
+- *Note: `espeak-ng` is required for the local TTS fallback if you don't use the ElevenLabs API.*
 
 </details>
 
-### 2. Download the Code
+### 2. Clone the Repository
 
-Open a terminal (like Command Prompt, PowerShell, or Terminal) and run this command to download the project:
+Open a terminal and run this command to download the project:
 
 ```bash
 git clone https://github.com/curlyphries/personal-dj.git
@@ -61,52 +63,68 @@ cd personal-dj
 
 ### 3. Set Up a Virtual Environment
 
-This step creates an isolated environment for the project's Python packages. Run these commands from the `personal-dj` directory.
+This creates an isolated Python environment for the project.
 
-- **On Windows**:
-  ```powershell
-  python -m venv .venv
-  .venv\Scripts\activate
-  ```
-
-- **On macOS and Linux**:
-  ```bash
-  python3 -m venv .venv
-  source .venv/bin/activate
-  ```
+- **Windows**: `python -m venv .venv && .\.venv\Scripts\activate`
+- **macOS/Linux**: `python3 -m venv .venv && source .venv/bin/activate`
 
 ### 4. Install Dependencies
 
-With your virtual environment activated, install the required packages for your operating system.
+With the virtual environment activated, install the required packages.
 
-- **On Windows**:
-  ```powershell
-  pip install -r requirements-win.txt
-  ```
+- **Windows**: `pip install -r requirements-win.txt`
+- **macOS/Linux**: `pip install -r requirements-unix.txt`
 
-- **On macOS and Linux**:
-  ```bash
-  pip install -r requirements-unix.txt
-  ```
+### 5. Set Up Your Navidrome Server
 
-### Environment Setup
+This application acts as a **client** to a [Navidrome](https://www.navidrome.org/) music streaming server. You must have your own Navidrome instance running. The recommended way to install it is with Docker.
 
-Create a `.env` file in the project root (you can copy `config/example.env`) and set the following:
+1.  **Install Docker**: Ensure [Docker Desktop](https://www.docker.com/products/docker-desktop/) is installed and running.
+2.  **Create `docker-compose.yml`**: Create a file named `docker-compose.yml` with the following content, replacing `/path/to/your/music` with the absolute path to your music library and `/path/to/navidrome/data` with a location for Navidrome's data.
 
--   `ELEVEN_API_KEY`: Your ElevenLabs key. If omitted, the app will use a local, offline TTS engine.
--   `MUSIC_DIR`: Path to your music library (e.g., `C:/Users/YourUser/Music`). Defaults to `~/Music`.
+    ```yaml
+    version: "3"
+    services:
+      navidrome:
+        image: deluan/navidrome:latest
+        user: 1000:1000
+        ports: ["4533:4533"]
+        restart: unless-stopped
+        environment:
+          ND_SCANSCHEDULE: 1h
+        volumes:
+          - "/path/to/navidrome/data:/data"
+          - "/path/to/your/music:/music:ro"
+    ```
 
-### Running the App
+3.  **Start Navidrome**: In the same directory as your `docker-compose.yml`, run `docker-compose up -d`.
+4.  **Create a User**: Open `http://localhost:4533` in your browser and create your administrator account.
 
-Once installed, run the app from the project's root directory:
+### 6. Configure the Application
 
-```bash
-python run.py --cli
-```
+Create a `.env` file by copying the example (`cp .env.example .env` or `copy .env.example .env`) and fill in the following details:
+
+- `NAVIDROME_URL`: The URL of your Navidrome server (e.g., `http://localhost:4533`).
+- `NAVIDROME_USER`: The username you created in Navidrome.
+- `NAVIDROME_PASS`: The password for your Navidrome user.
+- `ELEVEN_API_KEY`: Your API key for ElevenLabs. If you leave this blank, the app will fall back to a local TTS engine (requires `espeak-ng` on Linux/macOS).
+
+### 7. Run the App
+
+You can run the application in two modes:
+
+- **GUI Mode (Default)**: `python run.py`
+- **CLI Mode**: `python run.py --cli`
+
+### 8. Troubleshooting
+
+-   **`RuntimeError: No supported music player found`**: The app requires `mpv`, `ffplay`, or `vlc`. Install one, for example: `sudo apt install mpv`.
+-   **`RuntimeError: Local TTS fallback requires 'espeak-ng'`**: Occurs on Linux/macOS if the `ELEVEN_API_KEY` is missing and `espeak-ng` is not installed. Fix by providing the API key or installing the engine: `sudo apt install espeak-ng`.
+-   **`ModuleNotFoundError` or other Python errors**: Ensure your virtual environment is active and you've installed the correct `requirements` file for your OS.
 
 ---
 
-## Docker Quick Start ⚡
+## Docker Quick Start 
 
 1.  **Build the Docker Image**:
     ```bash

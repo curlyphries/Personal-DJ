@@ -3,7 +3,9 @@ VoiceAgent: sends text to ElevenLabs TTS and returns a local mp3 path.
 If the API key is missing, it falls back to printing the text to the console.
 """
 import os
+import platform
 import requests
+import shutil
 import uuid
 import tempfile
 import pyttsx3
@@ -24,12 +26,16 @@ class VoiceAgent:
         self.logger = logger
         self.tts_engine = None
         if not ELEVEN_API_KEY:
-            self.logger.warning("ElevenLabs API key not found. Initializing local TTS fallback.")
+            self.logger.warning("ElevenLabs API key not found. Attempting to initialize local TTS fallback.")
             try:
+                # On non-Windows systems, espeak-ng is required for pyttsx3 to work.
+                if platform.system() != "Windows" and not shutil.which("espeak-ng"):
+                    raise RuntimeError("Local TTS fallback requires 'espeak-ng'. Please install it (e.g., 'sudo apt install espeak-ng').")
                 self.tts_engine = pyttsx3.init()
                 self.logger.info("Local TTS engine initialized successfully.")
             except Exception as e:
                 self.logger.error(f"Failed to initialize local TTS engine: {e}")
+                self.tts_engine = None
         else:
             self.logger.info("Voice Agent: Initialized with ElevenLabs API.")
 

@@ -13,6 +13,7 @@ class MusicAgent:
             self.logger.info(f"Music Agent: Using player '{self.player_executable}'.")
         else:
             self.logger.error("Music Agent: No supported music player found (mpv, ffplay, vlc).")
+            raise RuntimeError("No supported music player found. Please install 'mpv', 'ffplay', or 'vlc'.")
 
     def _find_player(self) -> str | None:
         """Finds the first available command-line music player."""

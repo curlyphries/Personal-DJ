@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.7.1] - 2025-08-15
+### Changed
+- **Docs: Consolidated Setup Guide**: Rewrote the `README.md` to provide a single, clear, and comprehensive guide for installation, Navidrome setup, and application configuration. Removed duplicated and conflicting instructions.
+- **Feat: Improved Error Handling**: Added robust checks for essential external dependencies. The application now raises a `RuntimeError` with clear instructions if a required music player (`mpv`, `ffplay`, `vlc`) or the local TTS engine (`espeak-ng` on Linux/macOS) is not found.
+
+### Fixed
+- **Docs: README Clarity**: Resolved confusing and contradictory setup instructions in the `README.md`.
+- **Bug: Missing Dependencies**: Addressed runtime failures by providing clear, actionable error messages when external dependencies are missing.
+
 ## [0.7.0] - 2025-08-15
 ### Added
 - **Feat: Cross-Platform Support**: The application is now fully compatible with Windows, macOS, and Linux.

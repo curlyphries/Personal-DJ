@@ -30,7 +30,7 @@ class Worker(QObject):
             
             # 1. DJ Agent
             self.status_updated.emit("DJ Agent: Generating commentary and selecting track...")
-            commentary, track_title, music_track_path = self.dispatcher.dj_agent.respond(vibe)
+            commentary, track_title, track_url = self.dispatcher.dj_agent.respond(vibe)
             
             # 2. Voice Agent
             self.status_updated.emit("Voice Agent: Generating commentary audio...")
@@ -41,11 +41,11 @@ class Worker(QObject):
                 self.status_updated.emit(f"Playing commentary...")
                 self.dispatcher.music_agent.play_track(commentary_audio_path)
             
-            if music_track_path:
+            if track_url:
                 display_title = track_title if track_title else "Unknown Track"
                 self.now_playing_updated.emit(display_title)
                 self.status_updated.emit(f"Playing music: {display_title}")
-                self.dispatcher.music_agent.play_track(music_track_path)
+                self.dispatcher.music_agent.play_track(track_url)
             else:
                 self.status_updated.emit("No music track was selected.")
                 self.now_playing_updated.emit("None")

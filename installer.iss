@@ -1,8 +1,8 @@
 #define MyAppName "AI DJ"
 #define MyAppVersion "1.0"
-#define MyAppPublisher "Your Name"
+#define MyAppPublisher "Personal DJ"
 #define MyAppURL "https://example.com"
-#define MyAppExeName "ai-dj-launcher.exe"
+#define MyAppExeName "ai-dj.exe"
 
 [Setup]
 AppId={{A1B2C3D4-E5F6-47H8-91I2-J3K4L5M6N7O8}
@@ -29,7 +29,7 @@ Name: "startmenu"; Description: "Create Start Menu shortcuts"; GroupDescription:
 
 [Files]
 ; Main application files
-Source: "*.*"; Excludes: "*.iss,*.ps1,*.tmp,*.log"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\\ai-dj.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"; Tasks: startmenu
@@ -40,13 +40,20 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"; Tasks: d
 Filename: "{tmp}\Docker Desktop Installer.exe"; Parameters: "install --quiet"; StatusMsg: "Installing Docker Desktop..."; Check: not DockerInstalled; Flags: skipifdoesntexist
 ; Install Ollama (silent)
 Filename: "{tmp}\OllamaSetup.exe"; Parameters: "/S"; StatusMsg: "Installing Ollama..."; Check: not OllamaInstalled; Flags: skipifdoesntexist
+; Install MPV player via winget (silent)
+Filename: "winget"; Parameters: "install --id=mpv.MPV -e --silent"; StatusMsg: "Installing MPV player..."; Check: not MPVInstalled; Flags: runhidden
 ; Launch after install
-Filename: "{app}\\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: postinstall nowait
 
 [Code]
 function DockerInstalled: Boolean;
 begin
   Result := FileExists(ExpandConstant('{sys}\\docker.exe'));
+end;
+
+function MPVInstalled: Boolean;
+begin
+  Result := FileExists(ExpandConstant('{pf64}\\mpv\\mpv.exe')) or FileExists(ExpandConstant('{pf32}\\mpv\\mpv.exe'));
 end;
 
 function OllamaInstalled: Boolean;

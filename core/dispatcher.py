@@ -27,7 +27,7 @@ class Dispatcher:
                 self.logger.info(f"Vibe received: '{vibe}'. Engaging agents...")
                 
                 # 1. DJ Agent generates commentary and selects a music track.
-                commentary, music_track_path = self.dj_agent.respond(vibe)
+                commentary, track_title, track_url = self.dj_agent.respond(vibe)
                 
                 # 2. Voice Agent turns the commentary into speech.
                 commentary_audio_path = self.voice_agent.speak(commentary)
@@ -36,8 +36,8 @@ class Dispatcher:
                 if commentary_audio_path:
                     self.music_agent.play_track(commentary_audio_path)
                 
-                if music_track_path:
-                    self.music_agent.play_track(music_track_path)
+                if track_url:
+                    self.music_agent.play_track(track_url)
                 else:
                     self.logger.warning("No music track was selected by the DJ Agent.")
 
