@@ -50,6 +50,29 @@ class DJAgent:
             self.logger.error(f"An unexpected error occurred with Ollama: {e}", exc_info=True)
             return "Let's get right to the music."
 
+    def _get_now_playing(self) -> tuple[str | None, str | None]:
+        """Returns the currently playing track in Navidrome, if any."""
+        if not self.navidrome_client:
+            self.logger.error("Cannot check now playing: Not connected to Navidrome.")
+            return None, None
+
+        self.logger.info("Checking Navidrome for currently playing track...")
+        try:
+            now_playing = self.navidrome_client.getNowPlaying()
+            entries = now_playing.get("nowPlaying", {}).get("entry")
+            if not entries:
+                self.logger.info("No active sessions found in Navidrome.")
+                return None, None
+
+            # API may return a list or a single dict
+            entry = entries[0] if isinstance(entries, list) else entries
+            song_title = f"{entry['artist']} - {entry['title']}"
+            self.logger.info(f"Detected currently playing track: '{song_title}'")
+            return song_title, None
+        except Exception as e:
+            self.logger.error(f"Failed to fetch now playing track from Navidrome: {e}")
+            return None, None
+
     def _get_track_from_navidrome(self) -> tuple[str | None, str | None]:
         """Fetches a random track from Navidrome and returns its title and stream URL."""
         if not self.navidrome_client:
@@ -83,5 +106,7 @@ class DJAgent:
             "Reply with one-sentence commentary. Do NOT mention the track path or title."
         )
         commentary = self._ollama_chat(prompt)
-        track_title, track_url = self._get_track_from_navidrome()
+        track_title, track_url = self._get_now_playing()
+        if not track_title:
+            track_title, track_url = self._get_track_from_navidrome()
         return commentary, track_title, track_url

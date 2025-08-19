@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.7.2] - 2025-08-19
+### Added
+- **Feat: Navidrome Now-Playing Detection**: `DJAgent` checks Navidrome for an active session before selecting a new track and includes improved error handling.
+
 ## [0.7.1] - 2025-08-15
 ### Changed
 - **Docs: Consolidated Setup Guide**: Rewrote the `README.md` to provide a single, clear, and comprehensive guide for installation, Navidrome setup, and application configuration. Removed duplicated and conflicting instructions.
