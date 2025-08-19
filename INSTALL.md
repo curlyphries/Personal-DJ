@@ -7,7 +7,7 @@ Welcome to Personal DJ! This guide provides a general overview of the installati
 1. Download **AI-DJ-Setup.exe** from the Releases page.
 2. Double-click and follow the wizard – it will:
    • Copy `ai-dj.exe` (bundled Python runtime)
-   • Silently install required tools (mpv, Docker Desktop, Ollama) if missing
+   • Silently install required tools (mpv, Ollama) if missing
 3. Leave “Run AI-DJ” checked on finish and enjoy!
 
 <details>
@@ -17,7 +17,6 @@ Welcome to Personal DJ! This guide provides a general overview of the installati
 |-----------|--------|
 | **Python** | Embedded via PyInstaller – no separate install |
 | **mpv** | Installed via `winget` if not found |
-| **Docker Desktop** | Downloaded & silent install for Navidrome container support |
 | **Ollama** | Downloaded & silent install for local LLM |
 
 You can uninstall everything from *Add/Remove Programs* like any other app.

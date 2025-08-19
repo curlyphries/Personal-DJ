@@ -24,10 +24,9 @@ First, ensure you have the necessary software for your operating system.
 - **Git**: Download and install from the [official Git website](https://git-scm.com/downloads/).
 - **Python 3.10+**: Install from the [Microsoft Store](https://www.microsoft.com/store/productId/9PJPW5LDXLZ5) or [python.org](https://www.python.org/downloads/).
 - **mpv Media Player**: A powerful, free media player. Install it with a package manager like [Winget](https://winstall.app/apps/9P98F7M3T08F) or [Chocolatey](https://community.chocolatey.org/packages/mpv).
-  ```powershell
+  powershell
   winget install mpv
-  ```
-
+  
 </details>
 
 <details>
@@ -35,20 +34,18 @@ First, ensure you have the necessary software for your operating system.
 
 - You'll need [Homebrew](https://brew.sh/), the package manager for macOS.
 - Install prerequisites with this command:
-  ```bash
+  bash
   brew install python git mpv
-  ```
-
+  
 </details>
 
 <details>
 <summary><strong>Linux (Debian/Ubuntu)</strong></summary>
 
 - Install prerequisites using `apt`:
-  ```bash
+  bash
   sudo apt update && sudo apt install python3 python3-venv git mpv espeak-ng
-  ```
-- *Note: `espeak-ng` is required for the local TTS fallback if you don't use the ElevenLabs API.*
+  - *Note: `espeak-ng` is required for the local TTS fallback if you don't use the ElevenLabs API.*
 
 </details>
 
@@ -56,10 +53,9 @@ First, ensure you have the necessary software for your operating system.
 
 Open a terminal and run this command to download the project:
 
-```bash
+bash
 git clone https://github.com/curlyphries/personal-dj.git
 cd personal-dj
-```
 
 ### 3. Set Up a Virtual Environment
 
@@ -75,29 +71,15 @@ With the virtual environment activated, install the required packages.
 - **Windows**: `pip install -r requirements-win.txt`
 - **macOS/Linux**: `pip install -r requirements-unix.txt`
 
-### 5. Set Up Your Navidrome Server
+### 5. Set Up Your Navidrome Server 
 
-This application acts as a **client** to a [Navidrome](https://www.navidrome.org/) music streaming server. You must have your own Navidrome instance running. The recommended way to install it is with Docker.
+This application acts as a **client** to a [Navidrome](https://www.navidrome.org/) music streaming server. You must have your own Navidrome instance running. You can run Navidrome via its native binary; see the Navidrome docs for installation instructions relevant to your OS.
 
-1.  **Install Docker**: Ensure [Docker Desktop](https://www.docker.com/products/docker-desktop/) is installed and running.
-2.  **Create `docker-compose.yml`**: Create a file named `docker-compose.yml` with the following content, replacing `/path/to/your/music` with the absolute path to your music library and `/path/to/navidrome/data` with a location for Navidrome's data.
+1.  Download the latest Navidrome release for your platform and unzip it.
+2.  Create a configuration file pointing `musicFolder` to your music directory and set a data directory for Navidrome’s database.
 
-    ```yaml
-    version: "3"
-    services:
-      navidrome:
-        image: deluan/navidrome:latest
-        user: 1000:1000
-        ports: ["4533:4533"]
-        restart: unless-stopped
-        environment:
-          ND_SCANSCHEDULE: 1h
-        volumes:
-          - "/path/to/navidrome/data:/data"
-          - "/path/to/your/music:/music:ro"
-    ```
 
-3.  **Start Navidrome**: In the same directory as your `docker-compose.yml`, run `docker-compose up -d`.
+3.  **Start Navidrome**: Run the `navidrome` binary and monitor its console for "HTTP server listening on".
 4.  **Create a User**: Open `http://localhost:4533` in your browser and create your administrator account.
 
 ### 6. Configure the Application
@@ -124,29 +106,6 @@ You can run the application in two modes:
 
 ---
 
-## Docker Quick Start 
-
-1.  **Build the Docker Image**:
-    ```bash
-    docker build -t ai-dj .
-    ```
-
-2.  **Run the Container**:
-    Mount your music library and provide your environment variables. The entrypoint is the CLI mode.
-    ```bash
-    docker run -it --rm \
-      -e ELEVEN_API_KEY="YOUR_KEY" \
-      -v "/path/to/your/music:/music:ro" \
-      ai-dj
-    ```
-    -   `--rm`: Cleans up the container after exit.
-    -   `-v`: Mounts your local music directory into the container (read-only).
-Inside the container you’ll see the prompt:
-```
-🎧  Local AI-DJ ready. Type 'quit' to exit.
-You >
-```
-Type a vibe and enjoy!
 
 ---
 
@@ -177,30 +136,6 @@ A minimal AI disc-jockey that:
 3. Converts commentary → speech via ElevenLabs
 4. Plays speech and a music track
 
-## Quick start
-
-```bash
-# build
-docker build -t ai-dj .
-
-# run (interactive CLI)
-docker run -it \
-  -e ELEVEN_API_KEY=YOUR_KEY \
-  -e ELEVEN_VOICE_ID=eleven_monolingual_v1 \
-  -e MUSIC_DIR=/music \
-  -v /host/path/to/mp3s:/music:ro \
-  ai-dj
-```
-
-Inside the container you’ll see:
-```
-🎧  Local AI-DJ ready. Type 'quit' to exit.
-You >
-```
-
-Type a vibe and the DJ will speak & play a track.
-
 ## Notes
-* `MUSIC_DIR` defaults to `/opt/navidrome/music` but can be overridden.
-* The image installs `mpv`; feel free to modify `MusicAgent.PLAYER` if you prefer `ffplay`.
-* Ollama models are downloaded at first run; ensure the container has internet access or pre-pull models into `/root/.ollama`.
+* `MUSIC_DIR` must point to your music folder when running the application.
+* Ollama models download on first use; ensure the application has internet access on first run or pre-download models via the Ollama CLI.

@@ -36,8 +36,8 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"; Tasks: 
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-; Install Docker Desktop (silent)
-Filename: "{tmp}\Docker Desktop Installer.exe"; Parameters: "install --quiet"; StatusMsg: "Installing Docker Desktop..."; Check: not DockerInstalled; Flags: skipifdoesntexist
+; (Docker Desktop step removed)
+; Docker Desktop installation removed
 ; Install Ollama (silent)
 Filename: "{tmp}\OllamaSetup.exe"; Parameters: "/S"; StatusMsg: "Installing Ollama..."; Check: not OllamaInstalled; Flags: skipifdoesntexist
 ; Install MPV player via winget (silent)
@@ -46,10 +46,6 @@ Filename: "winget"; Parameters: "install --id=mpv.MPV -e --silent"; StatusMsg: "
 Filename: "{app}\\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: postinstall nowait
 
 [Code]
-function DockerInstalled: Boolean;
-begin
-  Result := FileExists(ExpandConstant('{sys}\\docker.exe'));
-end;
 
 function MPVInstalled: Boolean;
 begin
@@ -63,13 +59,7 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-  // Download Docker Desktop if not present
-  if not DockerInstalled then
-  begin
-    DownloadTemporaryFile('https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe',
-      'Docker Desktop Installer.exe', '', nil);
-  end;
-  
+    
   // Download Ollama if not present
   if not OllamaInstalled then
   begin
