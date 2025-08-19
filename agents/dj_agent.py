@@ -1,7 +1,15 @@
 import os
 import subprocess
 from dotenv import load_dotenv
-import libsonic
+import platform
+
+# libsonic is not available on Windows, so we'll guard the import.
+try:
+    import libsonic
+except ImportError:
+    libsonic = None
+
+from core.user_profile import UserProfile
 
 # Load environment variables from .env file
 load_dotenv()
@@ -10,13 +18,22 @@ class DJAgent:
     """The DJ agent, responsible for generating commentary and selecting tracks from Navidrome."""
     MODEL = "gemma3:4b"  # keep small; swap later
 
-    def __init__(self, logger):
+    def __init__(self, logger, profile_name: str = "default"):
         """Initializes the DJ agent and connects to Navidrome."""
         self.logger = logger
         self.navidrome_client = None
+        self.user_profile = UserProfile(profile_name)
         self._connect_to_navidrome()
 
     def _connect_to_navidrome(self):
+        if not libsonic:
+            self.logger.warning(
+                "'libsonic' library not found, Navidrome connection is disabled. "
+                "This is expected on Windows."
+            )
+            self.navidrome_client = None
+            return
+
         self.logger.info("Attempting to connect to Navidrome...")
         try:
             url = os.getenv("NAVIDROME_URL")
@@ -77,11 +94,25 @@ class DJAgent:
 
     def respond(self, user_msg: str) -> tuple[str, str | None, str | None]:
         self.logger.info(f"DJ Agent responding to: '{user_msg}'")
+        
+        # Get personalized context from user profile
+        personalized_context = self.user_profile.get_personalized_prompt_context()
+        
+        # Record this interaction
+        self.user_profile.record_interaction("user_request", {"message": user_msg, "timestamp": self.user_profile.last_updated})
+        
+        # Create personalized prompt
         prompt = (
-            "You are DJ-Echo, a cool late-night radio host. "
+            f"{personalized_context} "
             f"User said: {user_msg}\n"
-            "Reply with one-sentence commentary. Do NOT mention the track path or title."
+            "Reply with one-sentence commentary that reflects your personality and what you know about the user. "
+            "Do NOT mention the track path or title."
         )
+        
         commentary = self._ollama_chat(prompt)
         track_title, track_url = self._get_track_from_navidrome()
+        
+        # Save profile after interaction
+        self.user_profile.save_profile()
+        
         return commentary, track_title, track_url

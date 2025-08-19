@@ -7,10 +7,12 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QPushButton,
     QLineEdit,
-    QLabel
+    QLabel,
+    QSplitter
 )
 from PySide6.QtCore import Qt, QThread
 from gui.worker import Worker
+from gui.music_controls import MusicControlWidget
 
 class MainWindow(QMainWindow):
     """The main window for the Personal DJ application."""
@@ -20,45 +22,69 @@ class MainWindow(QMainWindow):
         self.logger = logger
         self.thread = None
         self.worker = None
+        self.music_controls = None
 
         self.setWindowTitle("Personal DJ")
-        self.setGeometry(100, 100, 400, 200)
+        self.setGeometry(100, 100, 600, 500)
 
         # --- Main Layout ---
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
-
+        
+        # Create splitter for main content and music controls
+        splitter = QSplitter(Qt.Vertical)
+        
+        # --- Top Section (DJ Interface) ---
+        top_widget = QWidget()
+        top_layout = QVBoxLayout(top_widget)
+        
         # --- Vibe Input ---
         self.vibe_input = QLineEdit()
         self.vibe_input.setPlaceholderText("Enter a vibe (e.g., 'late-night synthwave')")
-        main_layout.addWidget(self.vibe_input)
+        top_layout.addWidget(self.vibe_input)
 
         # --- Status Label ---
         self.status_label = QLabel("Welcome to your Personal DJ. Enter a vibe to begin.")
         self.status_label.setAlignment(Qt.AlignCenter)
         self.status_label.setWordWrap(True)
-        main_layout.addWidget(self.status_label)
+        top_layout.addWidget(self.status_label)
 
         # --- Buttons ---
         button_layout = QHBoxLayout()
         self.start_button = QPushButton("Start DJ")
-        self.stop_button = QPushButton("Stop")
+        self.stop_button = QPushButton("Stop Session")
         self.quit_button = QPushButton("Quit")
         button_layout.addWidget(self.start_button)
         button_layout.addWidget(self.stop_button)
         button_layout.addWidget(self.quit_button)
-        main_layout.addLayout(button_layout)
-
-        # --- Now Playing Label ---
-        self.now_playing_label = QLabel("Now Playing: None")
-        self.now_playing_label.setAlignment(Qt.AlignCenter)
-        main_layout.addWidget(self.now_playing_label)
+        top_layout.addLayout(button_layout)
+        
+        splitter.addWidget(top_widget)
+        
+        # --- Music Controls Section ---
+        self.music_controls = MusicControlWidget()
+        self.music_controls.setMinimumHeight(200)
+        splitter.addWidget(self.music_controls)
+        
+        # Set splitter proportions
+        splitter.setSizes([200, 300])
+        main_layout.addWidget(splitter)
+        
+        # Remove the old now playing label as it's now in music controls
 
         # --- Connections ---
         self.start_button.clicked.connect(self.start_dj_session)
         self.stop_button.clicked.connect(self.stop_dj_session)
         self.quit_button.clicked.connect(self.close)
+        
+        # Connect music control signals
+        self.music_controls.play_requested.connect(self.on_play_requested)
+        self.music_controls.pause_requested.connect(self.on_pause_requested)
+        self.music_controls.stop_requested.connect(self.on_stop_requested)
+        self.music_controls.skip_requested.connect(self.on_skip_requested)
+        self.music_controls.volume_changed.connect(self.on_volume_changed)
+        self.music_controls.seek_requested.connect(self.on_seek_requested)
 
     def start_dj_session(self):
         """Starts the background worker to handle the DJ logic."""
@@ -83,6 +109,7 @@ class MainWindow(QMainWindow):
         self.worker.status_updated.connect(self.update_status)
         self.worker.now_playing_updated.connect(self.update_now_playing)
         self.worker.error_occurred.connect(self.handle_error)
+        self.worker.music_status_updated.connect(self.music_controls.update_status)
 
         # --- Start the thread ---
         self.thread.start()
@@ -105,8 +132,8 @@ class MainWindow(QMainWindow):
             self.start_button.setEnabled(True)
 
     def update_now_playing(self, track_name: str):
-        """Updates the 'Now Playing' label."""
-        self.now_playing_label.setText(f"Now Playing: {track_name}")
+        """Updates the 'Now Playing' display."""
+        self.music_controls.update_status("playing", track_name)
 
     def handle_error(self, error_message: str):
         """Displays an error message in the status label."""
@@ -119,3 +146,33 @@ class MainWindow(QMainWindow):
             self.thread.quit()
             self.thread.wait() # Wait for the thread to finish
         QApplication.quit()
+    
+    def on_play_requested(self):
+        """Handle play request from music controls."""
+        if self.worker:
+            self.worker.resume_music()
+    
+    def on_pause_requested(self):
+        """Handle pause request from music controls."""
+        if self.worker:
+            self.worker.pause_music()
+    
+    def on_stop_requested(self):
+        """Handle stop request from music controls."""
+        if self.worker:
+            self.worker.stop_music()
+    
+    def on_skip_requested(self):
+        """Handle skip request from music controls."""
+        if self.worker:
+            self.worker.skip_track()
+    
+    def on_volume_changed(self, volume):
+        """Handle volume change from music controls."""
+        if self.worker:
+            self.worker.set_volume(volume)
+    
+    def on_seek_requested(self, position):
+        """Handle seek request from music controls."""
+        if self.worker:
+            self.worker.seek_to(position)
